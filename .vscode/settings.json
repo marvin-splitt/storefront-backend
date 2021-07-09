@@ -1,0 +1,54 @@
+{
+    "workbench.iconTheme": "material-icon-theme",
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#322652",
+        "titleBar.activeBackground": "#463572",
+        "titleBar.activeForeground": "#FBFAFD"
+    },
+    "editor.fontFamily": "'JetBrains Mono', 'Hack', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "window.zoomLevel": 1,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.tslint": true,
+        "source.fixAll.eslint": true
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "eslint.migration.2_x": "off",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "sync.autoUpload": true,
+    "sync.forceUpload": false,
+    "editor.renameOnType": true,
+    "diffEditor.ignoreTrimWhitespace": true,
+    "dart.flutterSdkPath": "/Users/marvin/git/flutter",
+    "[dart]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.rulers": [80],
+        "editor.selectionHighlight": false,
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.suggestSelection": "first",
+        "editor.tabCompletion": "onlySnippets",
+        "editor.wordBasedSuggestions": false
+    },
+    "dart.openDevTools": "flutter",
+    "git.autofetch": true,
+    "workbench.colorTheme": "Community Material Theme Darker High Contrast",
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter.notebook.ipynb"
+    },
+    "tabnine.experimentalAutoImports": true
+}
