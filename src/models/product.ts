@@ -44,7 +44,7 @@ export class ProductStore {
     async create(product: Product): Promise<ProductDB> {
         const connection: PoolClient = await client.connect();
         try {
-            await connection.query('BEGIN')
+            await connection.query('BEGIN');
             const sql = 'INSERT INTO products (name, quantity, description) VALUES ($1, $2, $3) RETURNING *;';
             const sqlValues = [product.name, product.quantity, product.description];
             const result: QueryResult = await connection.query(sql, sqlValues);
@@ -62,7 +62,7 @@ export class ProductStore {
     async update(product: ProductDB): Promise<ProductDB> {
         const connection: PoolClient = await client.connect();
         try {
-            await connection.query('BEGIN')
+            await connection.query('BEGIN');
             const sql = 'UPDATE products SET name=($1), quantity=($2), description=($3) WHERE id=($4);';
             const sqlValues = [product.name, product.quantity, product.description, product.id];
             const result: QueryResult = await connection.query(sql, sqlValues);
@@ -80,7 +80,7 @@ export class ProductStore {
     async delete(id: number): Promise<ProductDB> {
         const connection: PoolClient = await client.connect();
         try {
-            await connection.query('BEGIN')
+            await connection.query('BEGIN');
             const sql = 'DELETE FROM products WHERE id=($1);';
             const sqlValues = [id];
             const result: QueryResult = await connection.query(sql, sqlValues);

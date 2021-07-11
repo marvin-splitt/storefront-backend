@@ -1,20 +1,29 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import { ProductStore } from './models/product';
+import productRouter from './routes/productRouter';
 
 const app: express.Application = express();
 const port = 3000;
 
 const productStore = new ProductStore();
 
+// const corsOptions: CorsOptions = {
+//     origin: ['http://localhost:3000'],
+// };
+
+app.use(cors());
 app.use(bodyParser.json());
+
+// Routes
+app.use('/products', productRouter);
 
 app.get('/', function (req: Request, res: Response) {
     res.send('Hello World!');
 });
 
 app.get('/test', function (req: Request, res: Response) {
-
     // productStore.create({
     //     name: 'test',
     //     quantity: 1,
@@ -25,9 +34,9 @@ app.get('/test', function (req: Request, res: Response) {
     // })
 
     productStore.index().then((product) => {
-        console.log(product)
+        console.log(product);
         res.json(product);
-    })
+    });
 });
 
 app.listen(port, function () {
