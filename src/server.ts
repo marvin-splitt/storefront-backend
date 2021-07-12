@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { ProductStore } from './models/product';
 import productRouter from './routes/productRouter';
+import userRouter from './routes/userRouter';
 
 const app: express.Application = express();
 const port = 3000;
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 
 // Routes
 app.use('/products', productRouter);
+app.use('/users', userRouter);
 
 app.get('/', function (req: Request, res: Response) {
     res.send('Hello World!');

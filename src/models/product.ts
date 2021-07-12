@@ -66,12 +66,12 @@ export class ProductStore {
             const sql = 'UPDATE products SET name=($1), quantity=($2), description=($3) WHERE id=($4);';
             const sqlValues = [product.name, product.quantity, product.description, product.id];
             const result: QueryResult = await connection.query(sql, sqlValues);
-            const createdProduct: ProductDB = result.rows[0];
+            const updatedProduct: ProductDB = result.rows[0];
             await connection.query('COMMIT');
-            return createdProduct;
+            return updatedProduct;
         } catch (err) {
             await connection.query('ROLLBACK');
-            throw new Error(`Could not create new product ${product.name}. Error: ${err}`);
+            throw new Error(`Could not update product ${product.name}. Error: ${err}`);
         } finally {
             connection.release();
         }
@@ -84,9 +84,9 @@ export class ProductStore {
             const sql = 'DELETE FROM products WHERE id=($1);';
             const sqlValues = [id];
             const result: QueryResult = await connection.query(sql, sqlValues);
-            const createdProduct: ProductDB = result.rows[0];
+            const deletedProduct: ProductDB = result.rows[0];
             await connection.query('COMMIT');
-            return createdProduct;
+            return deletedProduct;
         } catch (err) {
             await connection.query('ROLLBACK');
             throw new Error(`Could not delete product with id ${id}. Error: ${err}`);

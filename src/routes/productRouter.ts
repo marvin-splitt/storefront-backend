@@ -1,9 +1,9 @@
 import { Product, ProductDB } from './../models/product';
 import express, { Request, Response } from 'express';
 import { ProductStore } from '../models/product';
+import verifyAuthToken from '../middleware/verifyAuthToken';
 
 const productStore = new ProductStore();
-
 const productRouter = express.Router();
 
 productRouter.get('/', async (_req: Request, res: Response): Promise<void> => {
@@ -30,7 +30,7 @@ productRouter.get('/:id', async (req: Request, res: Response): Promise<void> => 
     }
 });
 
-productRouter.put('/:id', async (req: Request, res: Response): Promise<void> => {
+productRouter.put('/:id', verifyAuthToken, async (req: Request, res: Response): Promise<void> => {
     try {
         const productId = parseInt(req.params['id'], 10);
         const newProduct: ProductDB = req.body;
@@ -48,7 +48,7 @@ productRouter.put('/:id', async (req: Request, res: Response): Promise<void> => 
     }
 });
 
-productRouter.post('/', async (req: Request, res: Response): Promise<void> => {
+productRouter.post('/', verifyAuthToken, async (req: Request, res: Response): Promise<void> => {
     try {
         const newProduct: Product = req.body;
         const createdProduct: ProductDB = await productStore.create(newProduct);
