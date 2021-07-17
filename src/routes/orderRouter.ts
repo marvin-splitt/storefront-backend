@@ -4,7 +4,8 @@ import express, { Request, Response } from 'express';
 const orderStore = new OrderStore;
 const orderRouter = express.Router();
 
-orderRouter.post('/:id/products', async(req: Request, res: Response): Promise<void> => {
+// Handler
+const addOrderProduct = async(req: Request, res: Response): Promise<void> => {
     const orderProduct: OrderProduct = req.body;
 
     try {
@@ -13,4 +14,9 @@ orderRouter.post('/:id/products', async(req: Request, res: Response): Promise<vo
     } catch (e) {
         res.status(500).send(e)
     }    
-})
+}
+
+// Routes
+orderRouter.post('/:id/products', addOrderProduct);
+
+export default orderRouter;

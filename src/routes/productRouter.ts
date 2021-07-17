@@ -6,7 +6,8 @@ import verifyAuthToken from '../middleware/verifyAuthToken';
 const productStore = new ProductStore();
 const productRouter = express.Router();
 
-productRouter.get('/', async (_req: Request, res: Response): Promise<void> => {
+// Handler
+const getAllProducts = async (_req: Request, res: Response): Promise<void> => {
     try {
         const products: ProductDB[] = await productStore.index();
         res.json(products);
@@ -14,9 +15,9 @@ productRouter.get('/', async (_req: Request, res: Response): Promise<void> => {
         res.status(500);
         res.send(e);
     }
-});
+}
 
-productRouter.get('/:id', async (req: Request, res: Response): Promise<void> => {
+const getProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const product: ProductDB = await productStore.show(parseInt(req.params['id'], 10));
         if (product) {
@@ -28,9 +29,9 @@ productRouter.get('/:id', async (req: Request, res: Response): Promise<void> => 
         res.status(500);
         res.send(e);
     }
-});
+}
 
-productRouter.put('/:id', verifyAuthToken, async (req: Request, res: Response): Promise<void> => {
+const updateProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const productId = parseInt(req.params['id'], 10);
         const newProduct: ProductDB = req.body;
@@ -46,9 +47,9 @@ productRouter.put('/:id', verifyAuthToken, async (req: Request, res: Response): 
         res.status(500);
         res.send(e);
     }
-});
+}
 
-productRouter.post('/', verifyAuthToken, async (req: Request, res: Response): Promise<void> => {
+const addProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const newProduct: Product = req.body;
         const createdProduct: ProductDB = await productStore.create(newProduct);
@@ -58,9 +59,9 @@ productRouter.post('/', verifyAuthToken, async (req: Request, res: Response): Pr
         res.status(500);
         res.send(e);
     }
-});
+}
 
-productRouter.delete('/:id', async (req: Request, res: Response): Promise<void> => {
+const deleteProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const productId = parseInt(req.params['id'], 10);
         const deletedProduct: ProductDB = await productStore.delete(productId);
@@ -69,6 +70,13 @@ productRouter.delete('/:id', async (req: Request, res: Response): Promise<void> 
         res.status(500);
         res.send(e);
     }
-});
+}
+
+// Routes
+productRouter.get('/', getAllProducts);
+productRouter.get('/:id', getProduct);
+productRouter.put('/:id', verifyAuthToken, updateProduct);
+productRouter.post('/', verifyAuthToken, addProduct);
+productRouter.delete('/:id', deleteProduct);
 
 export default productRouter;
