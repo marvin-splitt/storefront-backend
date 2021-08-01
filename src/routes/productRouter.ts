@@ -77,6 +77,6 @@ productRouter.get('/', getAllProducts);
 productRouter.get('/:id', getProduct);
 productRouter.put('/:id', verifyAuthToken, updateProduct);
 productRouter.post('/', verifyAuthToken, addProduct);
-productRouter.delete('/:id', deleteProduct);
+productRouter.delete('/:id', verifyAuthToken, deleteProduct);
 
 export default productRouter;

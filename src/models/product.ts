@@ -3,8 +3,8 @@ import client from '../database';
 
 export interface Product {
     name: string;
-    quantity: number;
-    description: string;
+    price: number;
+    category: string;
 }
 
 export interface ProductDB extends Product {
@@ -45,8 +45,8 @@ export class ProductStore {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
-            const sql = 'INSERT INTO products (name, quantity, description) VALUES ($1, $2, $3) RETURNING *;';
-            const sqlValues = [product.name, product.quantity, product.description];
+            const sql = 'INSERT INTO products (name, price, category) VALUES ($1, $2, $3) RETURNING *;';
+            const sqlValues = [product.name, product.price, product.category];
             const result: QueryResult = await connection.query(sql, sqlValues);
             const createdProduct: ProductDB = result.rows[0];
             await connection.query('COMMIT');
@@ -63,8 +63,8 @@ export class ProductStore {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
-            const sql = 'UPDATE products SET name=($1), quantity=($2), description=($3) WHERE id=($4);';
-            const sqlValues = [product.name, product.quantity, product.description, product.id];
+            const sql = 'UPDATE products SET name=($1), price=($2), category=($3) WHERE id=($4);';
+            const sqlValues = [product.name, product.price, product.category, product.id];
             const result: QueryResult = await connection.query(sql, sqlValues);
             const updatedProduct: ProductDB = result.rows[0];
             await connection.query('COMMIT');

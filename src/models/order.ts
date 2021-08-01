@@ -21,6 +21,11 @@ export interface OrderProductDB extends OrderProduct {
 }
 
 export class OrderStore {
+
+    async createOrder() {
+
+    }
+
     async addProduct(orderProduct: OrderProduct): Promise<OrderProductDB> {
         const connection: PoolClient = await client.connect();
         try {

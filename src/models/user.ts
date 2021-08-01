@@ -3,7 +3,9 @@ import client from '../database';
 import bcrypt from 'bcrypt';
 
 export interface User {
-    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
     password: string;
 }
 
@@ -47,7 +49,7 @@ export class UserStore {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
-            const sql = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *;';
+            const sql = 'INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *;';
 
             if (!BCRYPT_PASSWORD) {
                 throw new Error('Missing env variable: BCRYPT_PASSWORD');
@@ -58,7 +60,7 @@ export class UserStore {
             }
 
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
-            const sqlValues = [user.username, hash];
+            const sqlValues = [user.firstName, user.lastName, user.email, hash];
             const result: QueryResult = await connection.query(sql, sqlValues);
             const createdUser: UserDB = result.rows[0];
 
@@ -66,7 +68,7 @@ export class UserStore {
             return createdUser;
         } catch (err) {
             await connection.query('ROLLBACK');
-            throw new Error(`Could not create new user ${user.username}. Error: ${err}`);
+            throw new Error(`Could not create new user: ${user.firstName} ${user.lastName}. Error: ${err}`);
         } finally {
             connection.release();
         }
@@ -76,7 +78,7 @@ export class UserStore {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
-            const sql = 'UPDATE users SET username=($1), password=($2) WHERE id=($3) RETURNING *;';
+            const sql = 'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE id=($5) RETURNING *;';
 
             if (!BCRYPT_PASSWORD) {
                 throw new Error('Missing env variable: BCRYPT_PASSWORD');
@@ -88,14 +90,14 @@ export class UserStore {
 
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
 
-            const sqlValues = [user.username, hash, user.id];
+            const sqlValues = [user.firstName, user.lastName, user.email, hash, user.id];
             const result: QueryResult = await connection.query(sql, sqlValues);
             const updatedUser: UserDB = result.rows[0];
             await connection.query('COMMIT');
             return updatedUser;
         } catch (err) {
             await connection.query('ROLLBACK');
-            throw new Error(`Could not update user ${user.username}. Error: ${err}`);
+            throw new Error(`Could not update user ${user.email}. Error: ${err}`);
         } finally {
             connection.release();
         }
@@ -119,11 +121,11 @@ export class UserStore {
         }
     }
 
-    async authenticate(username: string, password: string): Promise<UserDB | null> {
+    async authenticate(email: string, password: string): Promise<UserDB | null> {
         const connection: PoolClient = await client.connect();
         try {
-            const sql = 'SELECT * FROM users where username=($1);';
-            const sqlValues = [username];
+            const sql = 'SELECT * FROM users where email=($1);';
+            const sqlValues = [email];
             const result: QueryResult = await connection.query(sql, sqlValues);
 
             if (result.rows.length) {
