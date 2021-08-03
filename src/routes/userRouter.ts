@@ -25,13 +25,39 @@ const getUser = async (req: Request, res: Response): Promise<void> => {
         const user: UserDB = await userStore.show(parseInt(req.params['id'], 10));
         if (user) {
             res.status(200).json(user);
+        } else {
+            res.status(404).send('User not found.');
         }
-        res.status(404).send('User not found.');
+        
     } catch (e) {
         res.status(500);
         res.send(e);
     }
 }
+
+const addDemoUser = async (req: Request, res: Response): Promise<void> => {
+    const user: User = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@test.com',
+        password: 'test'
+    };
+    try {
+        if (!TOKEN_SECRET) {
+            throw new Error('Missing env variable: TOKEN_SECRET');
+        }
+        const newUser: UserDB = await userStore.create(user);
+        const token = jwt.sign({ user: {
+            id: newUser.id,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            email: newUser.email
+        } }, TOKEN_SECRET);
+        res.status(201).json(token);
+    } catch (e) {
+        res.status(500).send(e);
+    }
+} 
 
 const addUser = async (req: Request, res: Response): Promise<void> => {
     const user: User = req.body;
@@ -75,7 +101,36 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
     const userId: number = parseInt(req.params['id'], 10);
     try {
         const deletedUser = await userStore.delete(userId);
-        res.status(204).json(deletedUser);
+        res.status(200).json(deletedUser);
+    } catch (e) {
+        res.status(500).send(e);
+    }
+}
+
+const authenticateUser = async (req: Request, res: Response): Promise<void> => {
+    const email: string = req.body.email;
+    const password: string = req.body.password;
+
+    try {
+        if (!email || ! password) {
+            throw new Error('Could not parse credentials');
+        }
+        if (!TOKEN_SECRET) {
+            throw new Error('Missing env variable: TOKEN_SECRET missing');
+        }
+        
+        const authUser = await userStore.authenticate(email, password);
+        if (!authUser) {
+            throw new Error(`Could not authenticate user: ${email}. Wrong credentials`);
+        }
+        const token = jwt.sign({ user: {
+            id: authUser.id,
+            firstName: authUser.firstName,
+            lastName: authUser.lastName,
+            email: authUser.email
+        } }, TOKEN_SECRET);
+
+        res.status(200).json(token);
     } catch (e) {
         res.status(500).send(e);
     }
@@ -84,9 +139,10 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
 // Routes
 userRouter.get('/', verifyAuthToken, getAllUsers);
 userRouter.get('/:id', verifyAuthToken, getUser);
+userRouter.post('/login', authenticateUser);
+userRouter.post('/demoUser', addDemoUser)
 userRouter.post('/', verifyAuthToken, addUser);
 userRouter.put('/:id', [verifyAuthToken, verifyUserId], updateUser);
 userRouter.delete('/:id', [verifyAuthToken, verifyUserId], deleteUser);
-
 
 export default userRouter;

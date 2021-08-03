@@ -1,4 +1,4 @@
-import { PoolClient, QueryResult } from 'pg';
+import { PoolClient } from 'pg';
 import client from '../database';
 import bcrypt from 'bcrypt';
 
@@ -6,7 +6,7 @@ export interface User {
     firstName: string;
     lastName: string;
     email: string;
-    password: string;
+    password?: string;
 }
 
 export interface UserDB extends User {
@@ -20,9 +20,8 @@ export class UserStore {
         const connection: PoolClient = await client.connect();
         try {
             const sql = 'SELECT * FROM users;';
-            const result: QueryResult = await connection.query(sql);
-            const users: UserDB[] = result.rows;
-            return users;
+            const users: UserDB[] = (await connection.query(sql)).rows;
+            return users.map((({password, ...rest}) => rest));
         } catch (err) {
             throw new Error(`Cannot get users ${err}`);
         } finally {
@@ -35,9 +34,8 @@ export class UserStore {
         try {
             const sql = 'SELECT * FROM users WHERE id=($1);';
             const sqlValues = [id];
-            const result: QueryResult = await connection.query(sql, sqlValues);
-            const user: UserDB = result.rows[0];
-            return user;
+            const users: UserDB[] = (await connection.query(sql, sqlValues)).rows;
+            return users.map((({password, ...rest}) => rest))[0];
         } catch (err) {
             throw new Error(`Could not find user with id ${id}. Error: ${err}`);
         } finally {
@@ -49,6 +47,7 @@ export class UserStore {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
+            const exitsingUserSQL = 'SELECT * from users where email=($1);';
             const sql = 'INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *;';
 
             if (!BCRYPT_PASSWORD) {
@@ -59,10 +58,15 @@ export class UserStore {
                 throw new Error('Missing env variable: SALT_ROUNDS');
             }
 
+            const existingUser = (await connection.query(exitsingUserSQL, [user.email])).rows[0];
+
+            if (existingUser) {
+                throw new Error('User does already exist');
+            }
+
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
             const sqlValues = [user.firstName, user.lastName, user.email, hash];
-            const result: QueryResult = await connection.query(sql, sqlValues);
-            const createdUser: UserDB = result.rows[0];
+            const createdUser: UserDB = (await connection.query(sql, sqlValues)).rows[0];
 
             await connection.query('COMMIT');
             return createdUser;
@@ -91,8 +95,7 @@ export class UserStore {
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
 
             const sqlValues = [user.firstName, user.lastName, user.email, hash, user.id];
-            const result: QueryResult = await connection.query(sql, sqlValues);
-            const updatedUser: UserDB = result.rows[0];
+            const updatedUser: UserDB = (await connection.query(sql, sqlValues)).rows[0];
             await connection.query('COMMIT');
             return updatedUser;
         } catch (err) {
@@ -109,8 +112,7 @@ export class UserStore {
             await connection.query('BEGIN');
             const sql = 'DELETE FROM users WHERE id=($1);';
             const sqlValues = [id];
-            const result: QueryResult = await connection.query(sql, sqlValues);
-            const deletedUser: UserDB = result.rows[0];
+            const deletedUser: UserDB = (await connection.query(sql, sqlValues)).rows[0];
             await connection.query('COMMIT');
             return deletedUser;
         } catch (err) {
@@ -123,17 +125,19 @@ export class UserStore {
 
     async authenticate(email: string, password: string): Promise<UserDB | null> {
         const connection: PoolClient = await client.connect();
+        console.log('test')
         try {
             const sql = 'SELECT * FROM users where email=($1);';
             const sqlValues = [email];
-            const result: QueryResult = await connection.query(sql, sqlValues);
 
-            if (result.rows.length) {
-                const user: UserDB = result.rows[0];
+            const user: UserDB = (await connection.query(sql, sqlValues)).rows[0];
 
-                if (bcrypt.compareSync(password + BCRYPT_PASSWORD, user.password)) {
-                    return user;
-                }
+            if (!user) {
+                throw new Error('Could not find user')
+            }
+
+            if (bcrypt.compareSync(password + BCRYPT_PASSWORD, user.password || '')) {
+                return user;
             }
             return null;
         } catch (err) {
