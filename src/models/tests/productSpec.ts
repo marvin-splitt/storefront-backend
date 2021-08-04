@@ -1,13 +1,13 @@
 import client from '../../database';
 import { ProductStore } from '../product';
 
-const store = new ProductStore();
+const productStore = new ProductStore();
 
 beforeAll(async () => {
-    await store.create({
+    await productStore.create({
         name: 'Apple iPhone XR',
-        quantity: 100,
-        description: 'Buy now and get 5% off',
+        price: 899,
+        category: 'Mobile Phones',
     });
 });
 
@@ -17,67 +17,67 @@ afterAll(async () => {
 
 describe('Product Model', () => {
     it('should have an index method', () => {
-        expect(store.index).toBeDefined();
+        expect(productStore.index).toBeDefined();
     });
 
     it('should have a show method', () => {
-        expect(store.show).toBeDefined();
+        expect(productStore.show).toBeDefined();
     });
 
     it('should have a create method', () => {
-        expect(store.create).toBeDefined();
+        expect(productStore.create).toBeDefined();
     });
 
     it('should have a update method', () => {
-        expect(store.update).toBeDefined();
+        expect(productStore.update).toBeDefined();
     });
 
     it('should have a delete method', () => {
-        expect(store.delete).toBeDefined();
+        expect(productStore.delete).toBeDefined();
     });
 
     it('create method should add a product', async () => {
-        const result = await store.create({
+        const result = await productStore.create({
             name: 'Mac Book Pro 2020 Model',
-            quantity: 250,
-            description: 'The Apple Mac Book Pro 2020 Model.',
+            price: 2599,
+            category: 'Notebooks',
         });
         expect(result).toEqual({
             id: result.id,
             name: 'Mac Book Pro 2020 Model',
-            quantity: 250,
-            description: 'The Apple Mac Book Pro 2020 Model.',
+            price: 2599,
+            category: 'Notebooks',
         });
     });
 
     it('index method should return a list of products', async () => {
-        const result = await store.index();
+        const result = await productStore.index();
         expect(result).toContain({
             id: 1,
             name: 'Apple iPhone XR',
-            quantity: 100,
-            description: 'Buy now and get 5% off',
+            price: 899,
+            category: 'Mobile Phones',
         });
     });
 
     it('show method should return the correct product', async () => {
-        const result = await store.show(1);
+        const result = await productStore.show(1);
         expect(result).toEqual({
             id: 1,
             name: 'Apple iPhone XR',
-            quantity: 100,
-            description: 'Buy now and get 5% off',
+            price: 899,
+            category: 'Mobile Phones',
         });
     });
 
     it('delete method should remove the product', async () => {
-        const result = await store.create({
+        const result = await productStore.create({
             name: 'Apple iPad Air 2021',
-            quantity: 300,
-            description: 'Special student offer',
+            price: 699,
+            category: 'Tablets',
         });
-        await store.delete(result.id);
-        const items = await store.index();
+        await productStore.delete(result.id);
+        const items = await productStore.index();
         expect(items).not.toContain(result);
     });
 });

@@ -125,7 +125,6 @@ export class UserStore {
 
     async authenticate(email: string, password: string): Promise<UserDB | null> {
         const connection: PoolClient = await client.connect();
-        console.log('test')
         try {
             const sql = 'SELECT * FROM users where email=($1);';
             const sqlValues = [email];
