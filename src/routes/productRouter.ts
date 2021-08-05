@@ -37,7 +37,7 @@ const updateProduct = async (req: Request, res: Response): Promise<void> => {
         const newProduct: ProductDB = req.body;
 
         if (!newProduct.category || !newProduct.name || !!newProduct.price) {
-            throw new Error('Missing product properties')
+            throw new Error('Missing product properties');
         }
 
         const existingProduct: ProductDB = await productStore.show(productId);
@@ -70,7 +70,7 @@ const deleteProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const productId = parseInt(req.params['id'], 10);
         const deletedProduct: ProductDB = await productStore.delete(productId);
-        res.status(204).json(deletedProduct);
+        res.status(200).json(deletedProduct);
     } catch (e) {
         res.status(500);
         res.send(e);
