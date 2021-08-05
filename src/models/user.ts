@@ -21,7 +21,7 @@ export class UserStore {
         try {
             const sql = 'SELECT * FROM users;';
             const users: UserDB[] = (await connection.query(sql)).rows;
-            return users.map((({password, ...rest}) => rest));
+            return users.map(({ password, ...rest }) => rest);
         } catch (err) {
             throw new Error(`Cannot get users ${err}`);
         } finally {
@@ -35,7 +35,7 @@ export class UserStore {
             const sql = 'SELECT * FROM users WHERE id=($1);';
             const sqlValues = [id];
             const users: UserDB[] = (await connection.query(sql, sqlValues)).rows;
-            return users.map((({password, ...rest}) => rest))[0];
+            return users.map(({ password, ...rest }) => rest)[0];
         } catch (err) {
             throw new Error(`Could not find user with id ${id}. Error: ${err}`);
         } finally {
@@ -48,7 +48,8 @@ export class UserStore {
         try {
             await connection.query('BEGIN');
             const exitsingUserSQL = 'SELECT * from users where email=($1);';
-            const sql = 'INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *;';
+            const sql =
+                'INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *;';
 
             if (!BCRYPT_PASSWORD) {
                 throw new Error('Missing env variable: BCRYPT_PASSWORD');
@@ -61,7 +62,7 @@ export class UserStore {
             const existingUser = (await connection.query(exitsingUserSQL, [user.email])).rows[0];
 
             if (existingUser) {
-                throw new Error('User does already exist');
+                return existingUser;
             }
 
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
@@ -82,7 +83,8 @@ export class UserStore {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
-            const sql = 'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE id=($5) RETURNING *;';
+            const sql =
+                'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE id=($5) RETURNING *;';
 
             if (!BCRYPT_PASSWORD) {
                 throw new Error('Missing env variable: BCRYPT_PASSWORD');
@@ -132,7 +134,7 @@ export class UserStore {
             const user: UserDB = (await connection.query(sql, sqlValues)).rows[0];
 
             if (!user) {
-                throw new Error('Could not find user')
+                throw new Error('Could not find user');
             }
 
             if (bcrypt.compareSync(password + BCRYPT_PASSWORD, user.password || '')) {

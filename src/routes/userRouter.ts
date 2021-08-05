@@ -18,7 +18,7 @@ const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
         res.status(500);
         res.send(e);
     }
-}
+};
 
 const getUser = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -28,36 +28,40 @@ const getUser = async (req: Request, res: Response): Promise<void> => {
         } else {
             res.status(404).send('User not found.');
         }
-        
     } catch (e) {
         res.status(500);
         res.send(e);
     }
-}
+};
 
 const addDemoUser = async (req: Request, res: Response): Promise<void> => {
     const user: User = {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john.doe@test.com',
-        password: 'test'
+        password: 'test',
     };
     try {
         if (!TOKEN_SECRET) {
             throw new Error('Missing env variable: TOKEN_SECRET');
         }
         const newUser: UserDB = await userStore.create(user);
-        const token = jwt.sign({ user: {
-            id: newUser.id,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            email: newUser.email
-        } }, TOKEN_SECRET);
+        const token = jwt.sign(
+            {
+                user: {
+                    id: newUser.id,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    email: newUser.email,
+                },
+            },
+            TOKEN_SECRET,
+        );
         res.status(201).json(token);
     } catch (e) {
         res.status(500).send(e);
     }
-} 
+};
 
 const addUser = async (req: Request, res: Response): Promise<void> => {
     const user: User = req.body;
@@ -66,17 +70,22 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             throw new Error('Missing env variable: TOKEN_SECRET');
         }
         const newUser: UserDB = await userStore.create(user);
-        const token = jwt.sign({ user: {
-            id: newUser.id,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            email: newUser.email
-        } }, TOKEN_SECRET);
+        const token = jwt.sign(
+            {
+                user: {
+                    id: newUser.id,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    email: newUser.email,
+                },
+            },
+            TOKEN_SECRET,
+        );
         res.status(201).json(token);
     } catch (e) {
         res.status(500).send(e);
     }
-}
+};
 
 const updateUser = async (req: Request, res: Response): Promise<void> => {
     const user: UserDB = req.body;
@@ -85,17 +94,22 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             throw new Error('Missing env variable: TOKEN_SECRET missing');
         }
         const updatedUser = await userStore.update(user);
-        const token = jwt.sign({ user: {
-            id: updatedUser.id,
-            firstName: updatedUser.firstName,
-            lastName: updatedUser.lastName,
-            email: updatedUser.email
-        } }, TOKEN_SECRET);
+        const token = jwt.sign(
+            {
+                user: {
+                    id: updatedUser.id,
+                    firstName: updatedUser.firstName,
+                    lastName: updatedUser.lastName,
+                    email: updatedUser.email,
+                },
+            },
+            TOKEN_SECRET,
+        );
         res.status(200).json(token);
     } catch (e) {
         res.status(500).send(e);
     }
-}
+};
 
 const deleteUser = async (req: Request, res: Response): Promise<void> => {
     const userId: number = parseInt(req.params['id'], 10);
@@ -105,42 +119,47 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
     } catch (e) {
         res.status(500).send(e);
     }
-}
+};
 
 const authenticateUser = async (req: Request, res: Response): Promise<void> => {
     const email: string = req.body.email;
     const password: string = req.body.password;
 
     try {
-        if (!email || ! password) {
+        if (!email || !password) {
             throw new Error('Could not parse credentials');
         }
         if (!TOKEN_SECRET) {
             throw new Error('Missing env variable: TOKEN_SECRET missing');
         }
-        
+
         const authUser = await userStore.authenticate(email, password);
         if (!authUser) {
             throw new Error(`Could not authenticate user: ${email}. Wrong credentials`);
         }
-        const token = jwt.sign({ user: {
-            id: authUser.id,
-            firstName: authUser.firstName,
-            lastName: authUser.lastName,
-            email: authUser.email
-        } }, TOKEN_SECRET);
+        const token = jwt.sign(
+            {
+                user: {
+                    id: authUser.id,
+                    firstName: authUser.firstName,
+                    lastName: authUser.lastName,
+                    email: authUser.email,
+                },
+            },
+            TOKEN_SECRET,
+        );
 
         res.status(200).json(token);
     } catch (e) {
         res.status(500).send(e);
     }
-}
+};
 
 // Routes
 userRouter.get('/', verifyAuthToken, getAllUsers);
 userRouter.get('/:id', verifyAuthToken, getUser);
 userRouter.post('/login', authenticateUser);
-userRouter.post('/demoUser', addDemoUser)
+userRouter.post('/demoUser', addDemoUser);
 userRouter.post('/', verifyAuthToken, addUser);
 userRouter.put('/:id', [verifyAuthToken, verifyUserId], updateUser);
 userRouter.delete('/:id', [verifyAuthToken, verifyUserId], deleteUser);

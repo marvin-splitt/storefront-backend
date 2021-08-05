@@ -15,39 +15,44 @@ const getAllProducts = async (_req: Request, res: Response): Promise<void> => {
         res.status(500);
         res.send(e);
     }
-}
+};
 
 const getProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const product: ProductDB = await productStore.show(parseInt(req.params['id'], 10));
         if (product) {
             res.status(200).json(product);
+            return;
         }
-
         res.status(404).send('Product not found.');
     } catch (e) {
         res.status(500);
         res.send(e);
     }
-}
+};
 
 const updateProduct = async (req: Request, res: Response): Promise<void> => {
     try {
         const productId = parseInt(req.params['id'], 10);
         const newProduct: ProductDB = req.body;
+
+        if (!newProduct.category || !newProduct.name || !!newProduct.price) {
+            throw new Error('Missing product properties')
+        }
+
         const existingProduct: ProductDB = await productStore.show(productId);
 
         if (existingProduct) {
-            const updatedProduct = await productStore.update(newProduct);
+            const updatedProduct = await productStore.update(productId, newProduct);
             res.status(200).json(updatedProduct);
+            return;
         }
-
         res.status(404).send('Could not update product, id not found.');
     } catch (e) {
         res.status(500);
         res.send(e);
     }
-}
+};
 
 const addProduct = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -59,7 +64,7 @@ const addProduct = async (req: Request, res: Response): Promise<void> => {
         res.status(500);
         res.send(e);
     }
-}
+};
 
 const deleteProduct = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -70,7 +75,7 @@ const deleteProduct = async (req: Request, res: Response): Promise<void> => {
         res.status(500);
         res.send(e);
     }
-}
+};
 
 // Routes
 productRouter.get('/', getAllProducts);
