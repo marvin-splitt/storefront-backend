@@ -33,17 +33,17 @@ const getProduct = async (req: Request, res: Response): Promise<void> => {
 
 const updateProduct = async (req: Request, res: Response): Promise<void> => {
     try {
-        const productId = parseInt(req.params['id'], 10);
+        const product_id = parseInt(req.params['id'], 10);
         const newProduct: ProductDB = req.body;
 
         if (!newProduct.category || !newProduct.name || !!newProduct.price) {
             throw new Error('Missing product properties');
         }
 
-        const existingProduct: ProductDB = await productStore.show(productId);
+        const existingProduct: ProductDB = await productStore.show(product_id);
 
         if (existingProduct) {
-            const updatedProduct = await productStore.update(productId, newProduct);
+            const updatedProduct = await productStore.update(product_id, newProduct);
             res.status(200).json(updatedProduct);
             return;
         }
@@ -68,8 +68,8 @@ const addProduct = async (req: Request, res: Response): Promise<void> => {
 
 const deleteProduct = async (req: Request, res: Response): Promise<void> => {
     try {
-        const productId = parseInt(req.params['id'], 10);
-        const deletedProduct: ProductDB = await productStore.delete(productId);
+        const product_id = parseInt(req.params['id'], 10);
+        const deletedProduct: ProductDB = await productStore.delete(product_id);
         res.status(200).json(deletedProduct);
     } catch (e) {
         res.status(500);

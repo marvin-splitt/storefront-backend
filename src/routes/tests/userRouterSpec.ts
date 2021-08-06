@@ -36,8 +36,8 @@ describe('POST /users', () => {
             .post('/users')
             .auth(demoToken, { type: 'bearer' })
             .send({
-                firstName: 'Luke',
-                lastName: 'Skywalker',
+                first_name: 'Luke',
+                last_name: 'Skywalker',
                 email: 'luke.skywalker@jedi-acedmy.com',
                 password: 'theforceiswithme',
             })
@@ -49,7 +49,7 @@ describe('POST /users', () => {
             .post('/users')
             .auth(demoToken, { type: 'bearer' })
             .send({
-                firstName: 'Luke',
+                first_name: 'Luke',
                 email: 'luke.skywalker@jedi-acedmy.com',
                 password: 'theforceiswithme',
             })
@@ -68,8 +68,8 @@ describe('PUT /users/:id', () => {
                 .post('/users')
                 .auth(demoToken, { type: 'bearer' })
                 .send({
-                    firstName: 'Dath',
-                    lastName: 'Vader',
+                    first_name: 'Dath',
+                    last_name: 'Vader',
                     email: 'darth.vader@thedarkside.com',
                     password: 'empireneedsme',
                 })
@@ -80,8 +80,8 @@ describe('PUT /users/:id', () => {
             .put(`/users/${userJWT.user.id}`)
             .auth(encodedJWT, { type: 'bearer' })
             .send({
-                firstName: 'Darth',
-                lastName: 'Vader',
+                first_name: 'Darth',
+                last_name: 'Vader',
                 email: 'darth.vader@thedarkside.com',
                 password: 'empireneedsyou',
             })
@@ -93,7 +93,7 @@ describe('PUT /users/:id', () => {
             .put(`/users/${demoUser.user.id}`)
             .auth(demoToken, { type: 'bearer' })
             .send({
-                firstName: 'John',
+                first_name: 'John',
                 email: 'john.doe@test.com',
             })
             .expect(500, done);
@@ -160,8 +160,8 @@ describe('DELETE /users/:id', () => {
                 .post('/users')
                 .auth(demoToken, { type: 'bearer' })
                 .send({
-                    firstName: 'Darth',
-                    lastName: 'Vader',
+                    first_name: 'Darth',
+                    last_name: 'Vader',
                     email: 'darth.vader@thedarkside.com',
                     password: 'empireneedsyou',
                 })
@@ -177,8 +177,8 @@ describe('DELETE /users/:id', () => {
                 .post('/users')
                 .auth(demoToken, { type: 'bearer' })
                 .send({
-                    firstName: 'Darth',
-                    lastName: 'Vader',
+                    first_name: 'Darth',
+                    last_name: 'Vader',
                     email: 'darth.vader@thedarkside.com',
                     password: 'empireneedsyou',
                 })

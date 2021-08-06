@@ -27,10 +27,10 @@ beforeAll(async () => {
         .post('/orders')
         .auth(demoToken, { type: 'bearer' })
         .send({
-            userId: 1,
+            user_id: 1,
             products: [
                 {
-                    productId: 1,
+                    product_id: 1,
                     quantity: 4,
                 },
             ],
@@ -40,10 +40,10 @@ beforeAll(async () => {
         .post('/orders')
         .auth(demoToken, { type: 'bearer' })
         .send({
-            userId: 1,
+            user_id: 1,
             products: [
                 {
-                    productId: 1,
+                    product_id: 1,
                     quantity: 8,
                 },
             ],
@@ -71,10 +71,10 @@ describe('POST /orders', () => {
             .post('/orders')
             .auth(demoToken, { type: 'bearer' })
             .send({
-                userId: 1,
+                user_id: 1,
                 products: [
                     {
-                        productId: 1,
+                        product_id: 1,
                         quantity: 4,
                     },
                 ],
@@ -87,10 +87,10 @@ describe('POST /orders', () => {
             .post('/orders')
             .auth(demoToken, { type: 'bearer' })
             .send({
-                userId: 1,
+                user_id: 1,
                 products: [
                     {
-                        productId: null,
+                        product_id: null,
                         quantity: null,
                     },
                 ],
@@ -137,7 +137,7 @@ describe('POST /orders/:id/product', () => {
             .post('/orders/1/product')
             .auth(demoToken, { type: 'bearer' })
             .send({
-                productId: 2,
+                product_id: 2,
                 quantity: 8,
             })
             .expect(201, done);

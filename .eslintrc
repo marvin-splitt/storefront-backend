@@ -19,5 +19,5 @@
             { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }
         ]
     },
-    "ignorePatterns": ["dist"]
+    "ignorePatterns": ["dist", "migrations"]
 }

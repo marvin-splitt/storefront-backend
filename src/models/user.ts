@@ -3,8 +3,8 @@ import client from '../database';
 import bcrypt from 'bcrypt';
 
 export interface User {
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     email: string;
     password?: string;
 }
@@ -59,7 +59,7 @@ export class UserStore {
                 throw new Error('Missing env variable: SALT_ROUNDS');
             }
 
-            if (!user.firstName || !user.lastName || !user.email || !user.password) {
+            if (!user.first_name || !user.last_name || !user.email || !user.password) {
                 throw new Error('Missing user properties');
             }
 
@@ -70,20 +70,20 @@ export class UserStore {
             }
 
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
-            const sqlValues = [user.firstName, user.lastName, user.email, hash];
+            const sqlValues = [user.first_name, user.last_name, user.email, hash];
             const createdUser: UserDB = (await connection.query(sql, sqlValues)).rows[0];
 
             await connection.query('COMMIT');
             return createdUser;
         } catch (err) {
             await connection.query('ROLLBACK');
-            throw new Error(`Could not create new user: ${user.firstName} ${user.lastName}. Error: ${err}`);
+            throw new Error(`Could not create new user: ${user.first_name} ${user.last_name}. Error: ${err}`);
         } finally {
             connection.release();
         }
     }
 
-    async update(userId: number, user: User): Promise<UserDB> {
+    async update(user_id: number, user: User): Promise<UserDB> {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
@@ -99,15 +99,15 @@ export class UserStore {
                 throw new Error('Missing env variable: SALT_ROUNDS');
             }
 
-            if (!user.firstName || !user.lastName || !user.email) {
+            if (!user.first_name || !user.last_name || !user.email) {
                 throw new Error('Missing user properties');
             }
 
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
 
             const sqlValues = user.password
-                ? [user.firstName, user.lastName, user.email, hash, userId]
-                : [user.firstName, user.lastName, user.email, userId];
+                ? [user.first_name, user.last_name, user.email, hash, user_id]
+                : [user.first_name, user.last_name, user.email, user_id];
             const updatedUser: UserDB = (await connection.query(sql, sqlValues)).rows[0];
             await connection.query('COMMIT');
             return updatedUser;

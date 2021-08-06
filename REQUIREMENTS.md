@@ -37,8 +37,8 @@ These are the notes from a meeting with the frontend developer that describe wha
 #### User
 
 -   id
--   firstName
--   lastName
+-   first_name
+-   last_name
 -   password
 
 #### Orders

@@ -59,12 +59,12 @@ export class ProductStore {
         }
     }
 
-    async update(productId: number, product: Product): Promise<ProductDB> {
+    async update(product_id: number, product: Product): Promise<ProductDB> {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
             const sql = 'UPDATE products SET name=($1), price=($2), category=($3) WHERE id=($4) RETURNING *;';
-            const sqlValues = [product.name, product.price, product.category, productId];
+            const sqlValues = [product.name, product.price, product.category, product_id];
             const result: QueryResult = await connection.query(sql, sqlValues);
             const updatedProduct: ProductDB = result.rows[0];
             await connection.query('COMMIT');

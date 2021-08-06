@@ -9,10 +9,10 @@ const orderRouter = express.Router();
 // Handler
 const addProductToOrder = async (req: Request, res: Response): Promise<void> => {
     const orderProduct: OrderProduct = req.body;
-    const orderId: number = parseInt(req.params['id'], 10);
+    const order_id: number = parseInt(req.params['id'], 10);
 
     try {
-        const createdOrderProduct = await orderStore.addProductToOrder(orderId, orderProduct);
+        const createdOrderProduct = await orderStore.addProductToOrder(order_id, orderProduct);
         if (!createdOrderProduct) {
             throw new Error('Could not add product to order');
         }
@@ -23,15 +23,15 @@ const addProductToOrder = async (req: Request, res: Response): Promise<void> => 
 };
 
 const createOrder = async (req: Request, res: Response): Promise<void> => {
-    const userId: number = req.body.userId;
+    const user_id: number = req.body.user_id;
     const products: OrderProduct[] = req.body.products;
 
     try {
-        if (!userId || !products || !products.length) {
-            throw new Error('Invalid request. Please provide a userId and a products array');
+        if (!user_id || !products || !products.length) {
+            throw new Error('Invalid request. Please provide a user_id and a products array');
         }
 
-        const orderProducts: OrderProductDB[] = await orderStore.createOrder(userId, products);
+        const orderProducts: OrderProductDB[] = await orderStore.createOrder(user_id, products);
 
         if (!orderProducts) {
             throw new Error('Could not create order');
@@ -53,13 +53,13 @@ const getAllOrders = async (_req: Request, res: Response): Promise<void> => {
 };
 
 const getProductsFromOrder = async (req: Request, res: Response): Promise<void> => {
-    const orderId: number = parseInt(req.params['id'], 10);
+    const order_id: number = parseInt(req.params['id'], 10);
 
     try {
-        const products: ProductDB[] = await orderStore.getProductsFromOrder(orderId);
+        const products: ProductDB[] = await orderStore.getProductsFromOrder(order_id);
 
         if (!products || !products.length) {
-            res.status(404).send(`Could not find products for order ${orderId}`);
+            res.status(404).send(`Could not find products for order ${order_id}`);
             return;
         }
 
@@ -70,13 +70,13 @@ const getProductsFromOrder = async (req: Request, res: Response): Promise<void> 
 };
 
 const getOrdersByUser = async (req: Request, res: Response): Promise<void> => {
-    const userId: number = parseInt(req.params['id'], 10);
+    const user_id: number = parseInt(req.params['id'], 10);
 
     try {
-        const orders: OrderDB[] = await orderStore.getOrdersByUser(userId);
+        const orders: OrderDB[] = await orderStore.getOrdersByUser(user_id);
 
         if (!orders || !orders.length) {
-            res.status(404).send(`Could not find orders for user ${userId}`);
+            res.status(404).send(`Could not find orders for user ${user_id}`);
             return;
         }
 
@@ -87,10 +87,10 @@ const getOrdersByUser = async (req: Request, res: Response): Promise<void> => {
 };
 
 const deleteOrder = async (req: Request, res: Response): Promise<void> => {
-    const orderId: number = parseInt(req.params['id'], 10);
+    const order_id: number = parseInt(req.params['id'], 10);
 
     try {
-        const deletedOrder: DeletedOrder = await orderStore.deleteOrder(orderId);
+        const deletedOrder: DeletedOrder = await orderStore.deleteOrder(order_id);
         res.json(deletedOrder);
     } catch (e) {
         res.status(500).send(e);

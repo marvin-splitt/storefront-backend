@@ -36,8 +36,8 @@ const getUser = async (req: Request, res: Response): Promise<void> => {
 
 const addDemoUser = async (req: Request, res: Response): Promise<void> => {
     const user: User = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john.doe@test.com',
         password: 'test',
     };
@@ -50,8 +50,8 @@ const addDemoUser = async (req: Request, res: Response): Promise<void> => {
             {
                 user: {
                     id: newUser.id,
-                    firstName: newUser.firstName,
-                    lastName: newUser.lastName,
+                    first_name: newUser.first_name,
+                    last_name: newUser.last_name,
                     email: newUser.email,
                 },
             },
@@ -74,8 +74,8 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             {
                 user: {
                     id: newUser.id,
-                    firstName: newUser.firstName,
-                    lastName: newUser.lastName,
+                    first_name: newUser.first_name,
+                    last_name: newUser.last_name,
                     email: newUser.email,
                 },
             },
@@ -89,18 +89,18 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
 
 const updateUser = async (req: Request, res: Response): Promise<void> => {
     const user: UserDB = req.body;
-    const userId: number = parseInt(req.params['id'], 10);
+    const user_id: number = parseInt(req.params['id'], 10);
     try {
         if (!TOKEN_SECRET) {
             throw new Error('Missing env variable: TOKEN_SECRET missing');
         }
-        const updatedUser = await userStore.update(userId, user);
+        const updatedUser = await userStore.update(user_id, user);
         const token = jwt.sign(
             {
                 user: {
                     id: updatedUser.id,
-                    firstName: updatedUser.firstName,
-                    lastName: updatedUser.lastName,
+                    first_name: updatedUser.first_name,
+                    last_name: updatedUser.last_name,
                     email: updatedUser.email,
                 },
             },
@@ -113,9 +113,9 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 };
 
 const deleteUser = async (req: Request, res: Response): Promise<void> => {
-    const userId: number = parseInt(req.params['id'], 10);
+    const user_id: number = parseInt(req.params['id'], 10);
     try {
-        const deletedUser = await userStore.delete(userId);
+        const deletedUser = await userStore.delete(user_id);
         res.status(200).json(deletedUser);
     } catch (e) {
         res.status(500).send(e);
@@ -142,8 +142,8 @@ const authenticateUser = async (req: Request, res: Response): Promise<void> => {
             {
                 user: {
                     id: authUser.id,
-                    firstName: authUser.firstName,
-                    lastName: authUser.lastName,
+                    first_name: authUser.first_name,
+                    last_name: authUser.last_name,
                     email: authUser.email,
                 },
             },

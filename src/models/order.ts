@@ -5,7 +5,7 @@ import { ProductDB } from './product';
 
 export interface Order {
     status: string;
-    userId: number;
+    user_id: number;
 }
 
 export interface OrderDB extends Order {
@@ -14,12 +14,12 @@ export interface OrderDB extends Order {
 
 export interface OrderProduct {
     quantity: number;
-    productId: number;
+    product_id: number;
 }
 
 export interface OrderProductDB extends OrderProduct {
     readonly id: number;
-    orderId: number;
+    order_id: number;
 }
 
 export interface DeletedOrder {
@@ -28,20 +28,20 @@ export interface DeletedOrder {
 }
 
 export class OrderStore {
-    async createOrder(userId: number, products: OrderProduct[]): Promise<OrderProductDB[]> {
+    async createOrder(user_id: number, products: OrderProduct[]): Promise<OrderProductDB[]> {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
 
             const userSQL = 'SELECT * from users where id=($1);';
-            const user: UserDB = (await connection.query(userSQL, [userId])).rows[0];
+            const user: UserDB = (await connection.query(userSQL, [user_id])).rows[0];
 
             if (!user) {
-                throw new Error(`Could not find user with id: ${userId}`);
+                throw new Error(`Could not find user with id: ${user_id}`);
             }
 
             const createOrderSQL = 'INSERT INTO orders (status, user_id) VALUES ($1, $2) RETURNING *;';
-            const order: OrderDB = (await connection.query(createOrderSQL, ['active', userId])).rows[0];
+            const order: OrderDB = (await connection.query(createOrderSQL, ['active', user_id])).rows[0];
 
             if (!order) {
                 throw new Error('Could not create new order');
@@ -51,7 +51,7 @@ export class OrderStore {
                 'INSERT INTO order_products (quantity, order_id, product_id) VALUES ($1, $2, $3) RETURNING *;';
 
             const productPromises = products.map(async (product: OrderProduct): Promise<OrderProductDB> => {
-                const sqlProductValues = [product.quantity, order.id, product.productId];
+                const sqlProductValues = [product.quantity, order.id, product.product_id];
                 const createdOrderProduct: OrderProductDB = (await connection.query(addProductSQL, sqlProductValues))
                     .rows[0];
 
@@ -67,7 +67,7 @@ export class OrderStore {
             return addedProducts;
         } catch (err) {
             await connection.query('ROLLBACK');
-            throw new Error(`Could not create order for user: ${userId}. Error: ${err}`);
+            throw new Error(`Could not create order for user: ${user_id}. Error: ${err}`);
         } finally {
             connection.release();
         }
@@ -86,39 +86,39 @@ export class OrderStore {
         }
     }
 
-    async getProductsFromOrder(orderId: number): Promise<ProductDB[]> {
+    async getProductsFromOrder(order_id: number): Promise<ProductDB[]> {
         const connection: PoolClient = await client.connect();
         try {
             const sql =
-                'SELECT p.id, name, price, category FROM products p INNER JOIN order_products ON product_id=order_id WHERE order_id=($1);';
-            const products: ProductDB[] = (await connection.query(sql, [orderId])).rows;
+                'SELECT p.id, name, price, category FROM products p INNER JOIN order_products o ON p.id=o.product_id WHERE o.order_id=($1);';
+            const products: ProductDB[] = (await connection.query(sql, [order_id])).rows;
             return products;
         } catch (err) {
-            throw new Error(`Could not get products for order: ${orderId}. Error: ${err}`);
+            throw new Error(`Could not get products for order: ${order_id}. Error: ${err}`);
         } finally {
             connection.release();
         }
     }
 
-    async getOrdersByUser(userId: number): Promise<OrderDB[]> {
+    async getOrdersByUser(user_id: number): Promise<OrderDB[]> {
         const connection: PoolClient = await client.connect();
         try {
             const sql = 'SELECT * FROM orders WHERE user_id=($1);';
-            const orders: OrderDB[] = (await connection.query(sql, [userId])).rows;
+            const orders: OrderDB[] = (await connection.query(sql, [user_id])).rows;
             return orders;
         } catch (err) {
-            throw new Error(`Could not get orders for user: ${userId}. Error: ${err}`);
+            throw new Error(`Could not get orders for user: ${user_id}. Error: ${err}`);
         } finally {
             connection.release();
         }
     }
 
-    async addProductToOrder(orderId: number, orderProduct: OrderProduct): Promise<OrderProductDB> {
+    async addProductToOrder(order_id: number, orderProduct: OrderProduct): Promise<OrderProductDB> {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
             const orderSQL = 'SELECT * FROM orders WHERE id=($1);';
-            const order: OrderDB = (await connection.query(orderSQL, [orderId])).rows[0];
+            const order: OrderDB = (await connection.query(orderSQL, [order_id])).rows[0];
 
             if (!order) {
                 throw new Error('Order does not exist, you may have to create it first');
@@ -129,24 +129,24 @@ export class OrderStore {
             }
 
             const sql = 'INSERT INTO order_products (quantity, order_id, product_id) VALUES ($1, $2, $3) RETURNING *;';
-            const sqlValues = [orderProduct.quantity, orderId, orderProduct.productId];
+            const sqlValues = [orderProduct.quantity, order_id, orderProduct.product_id];
             const createdOrderProduct: OrderProductDB = (await connection.query(sql, sqlValues)).rows[0];
             await connection.query('COMMIT');
             return createdOrderProduct;
         } catch (err) {
             await connection.query('ROLLBACK');
-            throw new Error(`Could not add product ${orderProduct.productId} to order ${orderId}. Error: ${err}`);
+            throw new Error(`Could not add product ${orderProduct.product_id} to order ${order_id}. Error: ${err}`);
         } finally {
             connection.release();
         }
     }
 
-    async deleteOrder(orderId: number): Promise<DeletedOrder> {
+    async deleteOrder(order_id: number): Promise<DeletedOrder> {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
             const orderSQL = 'SELECT * FROM orders WHERE id=($1);';
-            const order: OrderDB = (await connection.query(orderSQL, [orderId])).rows[0];
+            const order: OrderDB = (await connection.query(orderSQL, [order_id])).rows[0];
 
             if (!order) {
                 throw new Error('Order does not exist, you may have to create it first');
@@ -158,9 +158,9 @@ export class OrderStore {
 
             const deleteProductsFromOrdersSQL = 'DELETE FROM order_products WHERE order_id=($1) RETURNING *;';
             const deleteOrderSQL = 'DELETE FROM orders WHERE id=($1) RETURNING *;';
-            const deletedProducts: OrderProductDB[] = (await connection.query(deleteProductsFromOrdersSQL, [orderId]))
+            const deletedProducts: OrderProductDB[] = (await connection.query(deleteProductsFromOrdersSQL, [order_id]))
                 .rows;
-            const deletedOrder: OrderDB = (await connection.query(deleteOrderSQL, [orderId])).rows[0];
+            const deletedOrder: OrderDB = (await connection.query(deleteOrderSQL, [order_id])).rows[0];
             await connection.query('COMMIT');
             return {
                 deletedProducts,
@@ -168,7 +168,7 @@ export class OrderStore {
             };
         } catch (err) {
             await connection.query('ROLLBACK');
-            throw new Error(`Could not delete order ${orderId}. Error: ${err}`);
+            throw new Error(`Could not delete order ${order_id}. Error: ${err}`);
         } finally {
             connection.release();
         }
