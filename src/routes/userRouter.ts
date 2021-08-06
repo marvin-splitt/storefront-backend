@@ -89,11 +89,12 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
 
 const updateUser = async (req: Request, res: Response): Promise<void> => {
     const user: UserDB = req.body;
+    const userId: number = parseInt(req.params['id'], 10);
     try {
         if (!TOKEN_SECRET) {
             throw new Error('Missing env variable: TOKEN_SECRET missing');
         }
-        const updatedUser = await userStore.update(user);
+        const updatedUser = await userStore.update(userId, user);
         const token = jwt.sign(
             {
                 user: {

@@ -15,6 +15,9 @@ const verifyAuthToken = (req: Request, res: Response, next: NextFunction): void 
         }
         const token = authorizationHeader.split(' ')[1];
         const decodedToken = jwt.verify(token, TOKEN_SECRET);
+        if (!decodedToken) {
+            throw new Error('Invalid token');
+        }
         res.locals['decodedToken'] = decodedToken;
         next();
     } catch (e) {

@@ -84,7 +84,6 @@ export class ProductStore {
             const sql = 'DELETE FROM products WHERE id=($1);';
             const sqlValues = [id];
             const result: QueryResult = await connection.query(sql, sqlValues);
-            console.log(result);
             const deletedProduct: ProductDB = result.rows[0];
             await connection.query('COMMIT');
             return deletedProduct;

@@ -1,6 +1,5 @@
 import request from 'supertest';
 import app from '../../server';
-import client from '../../database';
 
 let demoToken: string;
 
@@ -50,13 +49,6 @@ beforeAll(async () => {
             ],
         })
         .expect(201);
-});
-
-afterAll(async () => {
-    await client.query('DELETE FROM order_products;');
-    await client.query('DELETE FROM orders;');
-    await client.query('DELETE FROM products;');
-    await client.query('DELETE FROM users;');
 });
 
 describe('GET /orders', () => {

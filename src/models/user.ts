@@ -59,6 +59,10 @@ export class UserStore {
                 throw new Error('Missing env variable: SALT_ROUNDS');
             }
 
+            if (!user.firstName || !user.lastName || !user.email || !user.password) {
+                throw new Error('Missing user properties');
+            }
+
             const existingUser = (await connection.query(exitsingUserSQL, [user.email])).rows[0];
 
             if (existingUser) {
@@ -79,12 +83,13 @@ export class UserStore {
         }
     }
 
-    async update(user: UserDB): Promise<UserDB> {
+    async update(userId: number, user: User): Promise<UserDB> {
         const connection: PoolClient = await client.connect();
         try {
             await connection.query('BEGIN');
-            const sql =
-                'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE id=($5) RETURNING *;';
+            const sql = user.password
+                ? 'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE id=($5) RETURNING *;'
+                : 'UPDATE users SET first_name=($1), last_name=($2), email=($3) WHERE id=($4) RETURNING *;';
 
             if (!BCRYPT_PASSWORD) {
                 throw new Error('Missing env variable: BCRYPT_PASSWORD');
@@ -94,9 +99,15 @@ export class UserStore {
                 throw new Error('Missing env variable: SALT_ROUNDS');
             }
 
+            if (!user.firstName || !user.lastName || !user.email) {
+                throw new Error('Missing user properties');
+            }
+
             const hash = bcrypt.hashSync(user.password + BCRYPT_PASSWORD, parseInt(SALT_ROUNDS));
 
-            const sqlValues = [user.firstName, user.lastName, user.email, hash, user.id];
+            const sqlValues = user.password
+                ? [user.firstName, user.lastName, user.email, hash, userId]
+                : [user.firstName, user.lastName, user.email, userId];
             const updatedUser: UserDB = (await connection.query(sql, sqlValues)).rows[0];
             await connection.query('COMMIT');
             return updatedUser;

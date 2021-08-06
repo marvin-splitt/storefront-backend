@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '../../server';
-import client from '../../database';
+import { ProductDB } from '../../models/product';
 
 let demoToken: string;
 
@@ -15,13 +15,6 @@ beforeAll(async () => {
         })
         .auth(demoToken, { type: 'bearer' })
         .expect(201);
-});
-
-afterAll(async () => {
-    await client.query('DELETE FROM order_products;');
-    await client.query('DELETE FROM orders;');
-    await client.query('DELETE FROM products;');
-    await client.query('DELETE FROM users;');
 });
 
 describe('GET /products', () => {
@@ -104,22 +97,24 @@ describe('PUT /products/:id', () => {
     });
 });
 
-fdescribe('DELETE /products/:id', () => {
+describe('DELETE /products/:id', (): void => {
     it('should respond with 401 if called without auth token', (done): void => {
         request(app).delete('/products/1').expect(401, done);
     });
 
     it('should respond with 200', async (): Promise<void> => {
-        await request(app)
-            .post('/products')
-            .send({
-                name: 'Test product 2',
-                price: 0,
-                category: 'Test',
-            })
-            .auth(demoToken, { type: 'bearer' })
-            .expect(201);
-        await request(app).delete('/products/2').auth(demoToken, { type: 'bearer' }).expect(200);
+        const product: ProductDB = (
+            await request(app)
+                .post('/products')
+                .send({
+                    name: 'Test product 2',
+                    price: 0,
+                    category: 'Test',
+                })
+                .auth(demoToken, { type: 'bearer' })
+                .expect(201)
+        ).body;
+        await request(app).delete(`/products/${product.id}`).auth(demoToken, { type: 'bearer' }).expect(200);
     });
 
     it('should respond with 404 if product does not exist', (done): void => {

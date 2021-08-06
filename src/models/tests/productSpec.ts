@@ -1,4 +1,3 @@
-import client from '../../database';
 import { ProductStore } from '../product';
 
 const productStore = new ProductStore();
@@ -9,10 +8,6 @@ beforeAll(async () => {
         price: 899,
         category: 'Mobile Phones',
     });
-});
-
-afterAll(async () => {
-    await client.query('DELETE FROM products;');
 });
 
 describe('Product Model', () => {
@@ -51,23 +46,23 @@ describe('Product Model', () => {
     });
 
     it('index method should return a list of products', async () => {
-        const result = await productStore.index();
-        expect(result).toContain({
-            id: 1,
-            name: 'Apple iPhone XR',
-            price: 899,
-            category: 'Mobile Phones',
+        const product = await productStore.create({
+            name: 'Apple iPad Air 2021',
+            price: 699,
+            category: 'Tablets',
         });
+        const result = await productStore.index();
+        expect(result).toContain(product);
     });
 
     it('show method should return the correct product', async () => {
-        const result = await productStore.show(1);
-        expect(result).toEqual({
-            id: 1,
-            name: 'Apple iPhone XR',
-            price: 899,
-            category: 'Mobile Phones',
+        const product = await productStore.create({
+            name: 'Apple iPad Air 2021',
+            price: 699,
+            category: 'Tablets',
         });
+        const result = await productStore.show(product.id);
+        expect(result).toEqual(product);
     });
 
     it('delete method should remove the product', async () => {

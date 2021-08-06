@@ -8,7 +8,8 @@ if (!TOKEN_SECRET) {
 
 const verifyUserId = (req: Request, res: Response, next: NextFunction): void => {
     const decodedToken = res.locals['decodedToken'];
-    if (!decodedToken || !decodedToken.user || decodedToken.user.id !== req.body['id']) {
+    const userId = parseInt(req.params['id'], 10) || req.body['id'] || req.body['userId'];
+    if (!decodedToken || !decodedToken.user || decodedToken.user.id !== userId) {
         res.status(401).send('You are not authorized to make changes to that user!');
         return;
     }
