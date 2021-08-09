@@ -7,7 +7,7 @@ import { User, UserDB, UserStore } from './../models/user';
 const userStore = new UserStore();
 const userRouter = express.Router();
 
-const { TOKEN_SECRET } = process.env;
+const { TOKEN_SECRET, DEMO_USER_PASSWORD } = process.env;
 
 // Handler
 const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
@@ -39,11 +39,15 @@ const addDemoUser = async (req: Request, res: Response): Promise<void> => {
         first_name: 'John',
         last_name: 'Doe',
         email: 'john.doe@test.com',
-        password: 'test',
+        password: DEMO_USER_PASSWORD,
     };
     try {
         if (!TOKEN_SECRET) {
             throw new Error('Missing env variable: TOKEN_SECRET');
+        }
+
+        if (!DEMO_USER_PASSWORD) {
+            throw new Error('Missing env variable: DEMO_USER_PASSWORD');
         }
         const newUser: UserDB = await userStore.create(user);
         const token = jwt.sign(
