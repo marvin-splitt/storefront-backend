@@ -94,7 +94,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
         if (!TOKEN_SECRET) {
             throw new Error('Missing env variable: TOKEN_SECRET missing');
         }
-        const updatedUser = await userStore.update(user_id, user);
+        const updatedUser: UserDB | null = await userStore.update(user_id, user);
         const token = jwt.sign(
             {
                 user: {
@@ -115,7 +115,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 const deleteUser = async (req: Request, res: Response): Promise<void> => {
     const user_id: number = parseInt(req.params['id'], 10);
     try {
-        const deletedUser = await userStore.delete(user_id);
+        const deletedUser: UserDB = await userStore.delete(user_id);
         res.status(200).json(deletedUser);
     } catch (e) {
         res.status(500).send(e);
@@ -134,7 +134,7 @@ const authenticateUser = async (req: Request, res: Response): Promise<void> => {
             throw new Error('Missing env variable: TOKEN_SECRET missing');
         }
 
-        const authUser = await userStore.authenticate(email, password);
+        const authUser: UserDB | null = await userStore.authenticate(email, password);
         if (!authUser) {
             throw new Error(`Could not authenticate user: ${email}. Wrong credentials`);
         }

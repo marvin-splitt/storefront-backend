@@ -6,7 +6,7 @@ if (!TOKEN_SECRET) {
     throw new Error('Missing env variable: TOKEN_SECRET');
 }
 
-const verifyuser_id = (req: Request, res: Response, next: NextFunction): void => {
+const verifyUserId = (req: Request, res: Response, next: NextFunction): void => {
     const decodedToken = res.locals['decodedToken'];
     const user_id = parseInt(req.params['id'], 10) || req.body['id'] || req.body['user_id'];
     if (!decodedToken || !decodedToken.user || decodedToken.user.id !== user_id) {
@@ -16,4 +16,4 @@ const verifyuser_id = (req: Request, res: Response, next: NextFunction): void =>
     next();
 };
 
-export default verifyuser_id;
+export default verifyUserId;

@@ -113,6 +113,20 @@ describe('GET /orders/:id', () => {
     });
 });
 
+describe('GET /orders/:id/products', () => {
+    it('should respond with 401 if called without auth token', (done): void => {
+        request(app).get('/orders/1/products').expect(401, done);
+    });
+
+    it('should respond with 200', (done): void => {
+        request(app).get('/orders/1/products').auth(demoToken, { type: 'bearer' }).expect(200, done);
+    });
+
+    it('should respond with 404 if order does not exist', (done): void => {
+        request(app).get('/orders/1000/products').auth(demoToken, { type: 'bearer' }).expect(404, done);
+    });
+});
+
 describe('GET /orders/ordersByUser/:id', () => {
     it('should respond with 401 if called without auth token', (done): void => {
         request(app).get('/orders/ordersByUser/1').expect(401, done);

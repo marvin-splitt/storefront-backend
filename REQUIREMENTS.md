@@ -9,20 +9,258 @@ These are the notes from a meeting with the frontend developer that describe wha
 #### Products
 
 -   Index
+    -   /products [GET]
+    -   Response on success: Status 200 and
+        ```json
+        [{
+            'id': number
+            'name': string,
+            'price': double,
+            'category': string
+        }]
+        ```
 -   Show
+    -   /products/:id [GET]
+    -   Response on success: Status 200 and
+        ```json
+        {
+            'id': number
+            'name': string,
+            'price': double,
+            'category': string
+        }
+        ```
 -   Create [token required]
+    -   /products [POST]
+    -   Needed Header: Authorization - Bear + Token
+    -   JSON Body Object:
+        ```json
+        {
+            'name': string,
+            'price': double,
+            'category': string
+        }
+        ```
+    -   Response on success: Status 201 and
+        ```json
+        {
+            'id': number
+            'name': string,
+            'price': double,
+            'category': string
+        }
+        ```
+-   Delete [token required]
+    -   /products/:id [DELETE]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+        ```json
+        {
+            'id': number
+            'name': string,
+            'price': double,
+            'category': string
+        }
+        ```
 -   [OPTIONAL] Top 5 most popular products
 -   [OPTIONAL] Products by category (args: product category)
 
 #### Users
 
 -   Index [token required]
+    -   /users [GET]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+        ```json
+        [{
+            'id': number,
+            'first_name': string,
+            'last_name': string,
+            'email': string
+        }]
+        ```
 -   Show [token required]
+    -   /users/:id [GET]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+        ```json
+        {
+            'id': number,
+            'first_name': string,
+            'last_name': string,
+            'email': string
+        }
+        ```
 -   Create N[token required]
+    -   /users [POST]
+    -   Needed Header: Authorization - Bear + Token
+    -   JSON Body Object:
+        ```json
+        {
+            'id': number,
+            'first_name': string,
+            'last_name': string,
+            'email': string,
+            'password': string
+        }
+        ```
+    -   Response on success: Status 200 and JWT Token
+-   Login
+    -   /users/login [POST]
+    -   Needed request json object:
+        ```json
+        {
+            'email': string,
+            'password': string
+        }
+        ```
+    -   Response on success: Status 200 and JWT Token
+-   Create Demo User
+    -   /users/demoUser [POST]
+    -   Response on success: Status 200 and JWT Token
+-   Update User [token required], can only be called by same user
+    -   /users/:id [POST]
+    -   Needed Header: Authorization - Bear + Token
+    -   JSON Body Object:
+        ```json
+        {
+            'first_name': string,
+            'last_name': string,
+            'email': string,
+            'password': string
+        }
+        ```
+    -   Response on success: Status 200 and JWT Token
+-   Delete User [token required], can only be called by same user
+    -   /users/:id [POST]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+    ```json
+        {
+            'id': number,
+            'first_name': string,
+            'last_name': string,
+            'email': string,
+            'password': string
+        }
+    ```
 
 #### Orders
 
 -   Current Order by user (args: user id)[token required]
+    -   /orders/ordersByUser/:id [GET]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+    ```json
+        {
+            'id': number,
+            'status': 'active' | 'complete',
+            'user_id': string,
+            'email': string,
+            'password': string
+        }
+    ```
+-   Show Orders [token required]
+    -   /orders [GET]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+        ```json
+            [{
+                'id': number,
+                'status': 'active' | 'complete',
+                'user_id': number
+            }]
+        ```
+-   Index Order [token required]
+    -   /orders/:id [GET]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+        ```json
+            {
+                'id': number,
+                'status': 'active' | 'complete',
+                'user_id': number
+            }
+        ```
+-   Get products from order
+    -   /orders/:id/products [GET]
+    -   Needed Header: Authorization - Bear + Token
+    -   Response on success: Status 200 and
+        ```json
+            [{
+                'id': number
+                'name': string,
+                'price': double,
+                'category': string
+            }]
+        ```
+-   Create Order [token required]
+    -   /orders [POST]
+    -   Needed Header: Authorization - Bear + Token
+    -   JSON Request Body:
+        ```json
+            {
+                'user_id': number,
+                'products' : [{
+                    'quantity': number,
+                    'product_id': number
+                }]
+            }
+        ```
+    -   Response on success: Status 201 and
+        ```json
+            [{
+                'id': number,
+                'order_id': number,
+                'user_id': number,
+                'quantity': number,
+            }]
+        ```
+-   Add product to Order [token required]
+    -   /orders/:id/product [POST]
+    -   Needed Header: Authorization - Bear + Token
+    -   JSON Request Body:
+        ```json
+            {
+                'quantity': number,
+                'product_id': number
+            }
+        ```
+    -   Response on success: Status 201 and
+        ```json
+            {
+                'id': number,
+                'order_id': number,
+                'user_id': number,
+                'quantity': number,
+            }
+        ```
+-   Delete Order [token required]
+    -   /orders/:id [DELETE]
+    -   Needed Header: Authorization - Bear + Token
+    -   JSON Request Body:
+        ```json
+            {
+                'quantity': number,
+                'product_id': number
+            }
+        ```
+    -   Response on success: Status 201 and
+        ```json
+            {
+                'deletedProducts': [{
+                    'id': number,
+                    'order_id': number,
+                    'user_id': number,
+                    'quantity': number,
+                }],
+                'deletedOrder': {
+                    'id': number,
+                    'status': 'active' | 'complete',
+                    'user_id': number
+                }
+            }
+        ```
 -   [OPTIONAL] Completed Orders by user (args: user id)[token required]
 
 ## Data Shapes
@@ -34,12 +272,17 @@ These are the notes from a meeting with the frontend developer that describe wha
 -   price
 -   [OPTIONAL] category
 
+#### Table: products (id:number, name:varchar, price:double, category:varchar)
+
 #### User
 
 -   id
 -   first_name
 -   last_name
 -   password
+-   email
+
+#### Table: users (id:number, first_name:varchar, last_name:varchar, password:varchar, email:varchar)
 
 #### Orders
 
@@ -48,3 +291,7 @@ These are the notes from a meeting with the frontend developer that describe wha
 -   quantity of each product in the order
 -   user_id
 -   status of order (active or complete)
+
+#### Table: orders (id:number, user_id:number [foreign key to users table], status:varchar)
+
+#### Table: order_products (id:number, product_id:number [foreign key to products table], order_id:number [foreign key to orders table], quantity:number)

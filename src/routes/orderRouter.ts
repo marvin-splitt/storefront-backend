@@ -12,7 +12,7 @@ const addProductToOrder = async (req: Request, res: Response): Promise<void> => 
     const order_id: number = parseInt(req.params['id'], 10);
 
     try {
-        const createdOrderProduct = await orderStore.addProductToOrder(order_id, orderProduct);
+        const createdOrderProduct: OrderProductDB = await orderStore.addProductToOrder(order_id, orderProduct);
         if (!createdOrderProduct) {
             throw new Error('Could not add product to order');
         }
@@ -47,6 +47,19 @@ const getAllOrders = async (_req: Request, res: Response): Promise<void> => {
     try {
         const orders: OrderDB[] = await orderStore.getAllOrders();
         res.json(orders);
+    } catch (e) {
+        res.status(500).send(e);
+    }
+};
+const getOrder = async (req: Request, res: Response): Promise<void> => {
+    const order_id: number = parseInt(req.params['id'], 10);
+    try {
+        const order: OrderDB = await orderStore.getOrder(order_id);
+        if (!order) {
+            res.status(404).send(`Could not find order ${order_id}`);
+            return;
+        }
+        res.json(order);
     } catch (e) {
         res.status(500).send(e);
     }
@@ -100,7 +113,8 @@ const deleteOrder = async (req: Request, res: Response): Promise<void> => {
 // Routes
 orderRouter.post('/:id/product', verifyAuthToken, addProductToOrder);
 orderRouter.post('/', verifyAuthToken, createOrder);
-orderRouter.get('/:id', verifyAuthToken, getProductsFromOrder);
+orderRouter.get('/:id', verifyAuthToken, getOrder);
+orderRouter.get('/:id/products', verifyAuthToken, getProductsFromOrder);
 orderRouter.get('/', verifyAuthToken, getAllOrders);
 orderRouter.get('/ordersByUser/:id', verifyAuthToken, getOrdersByUser);
 orderRouter.delete('/:id', verifyAuthToken, deleteOrder);

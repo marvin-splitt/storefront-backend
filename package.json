@@ -9,7 +9,7 @@
         "test": "npm run test-up && NODE_ENV=test jasmine-ts; npm run test-down",
         "test-up": "db-migrate db:create storefront_test && db-migrate --env test up",
         "test-down": "db-migrate db:drop storefront_test",
-        "tsc": "tsc",
+        "build": "tsc",
         "lint": "eslint '*/**/*.{js,ts}' --fix",
         "prettier": "prettier --write ."
     },

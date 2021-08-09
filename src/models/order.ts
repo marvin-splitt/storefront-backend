@@ -86,6 +86,19 @@ export class OrderStore {
         }
     }
 
+    async getOrder(order_id: number): Promise<OrderDB> {
+        const connection: PoolClient = await client.connect();
+        try {
+            const sql = 'SELECT * FROM orders WHERE id=($1);';
+            const order: OrderDB = (await connection.query(sql, [order_id])).rows[0];
+            return order;
+        } catch (err) {
+            throw new Error(`Could not get order with id: ${order_id}. Error: ${err}`);
+        } finally {
+            connection.release();
+        }
+    }
+
     async getProductsFromOrder(order_id: number): Promise<ProductDB[]> {
         const connection: PoolClient = await client.connect();
         try {
