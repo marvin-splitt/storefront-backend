@@ -66,7 +66,7 @@ Install dependencies
   npm install
 ```
 
-Set up both the `.env` file and `database.json` for connecting to the database and a working authorization. Example files are provided with needed keys
+Set up the `.env` file for connecting to the database and a working authorization. `.env.example` file is provided with needed keys
 
 Run the migrations
 
