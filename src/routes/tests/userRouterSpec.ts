@@ -11,6 +11,8 @@ type UserJWT = {
 let demoToken: string;
 let demoUser: UserJWT;
 
+const {DEMO_USER_PASSWORD} = process.env;
+
 beforeAll(async () => {
     demoToken = (await request(app).post('/users/demoUser').expect(201)).body;
     demoUser = jwt.decode(demoToken) as UserJWT;
@@ -121,7 +123,7 @@ describe('POST /users/login', () => {
             .auth(demoToken, { type: 'bearer' })
             .send({
                 email: 'john.doe@test.com',
-                password: 'test',
+                password: DEMO_USER_PASSWORD,
             })
             .expect(200, done);
     });
