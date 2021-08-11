@@ -6,7 +6,7 @@ It provides an express application serving several API endpoints for storing and
 
 ## API Reference
 
-Go to the `Requirements.md` file for the API Endpoint reference and data shape documentation.
+Go to the `REQUIREMENTS.md` file for the API Endpoint reference and data shape documentation.
 
 ## Scripts
 
