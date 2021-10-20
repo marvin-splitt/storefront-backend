@@ -51,7 +51,7 @@ Run the application
 Clone the project
 
 ```bash
-  git clone https://gitlab.com/msplitt/storefront-backend.git
+  git clone https://github.com/marvin-splitt/storefront-backend.git
 ```
 
 Go to the project directory
@@ -98,4 +98,4 @@ To run tests, run the following command
 
 ## Author
 
-Marvin Splitt ([@msplitt](https://gitlab.com/msplitt))
+Marvin Splitt ([@marvin-splitt](https://github.com/marvin-splitt))
